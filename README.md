@@ -1,6 +1,6 @@
 # Schejulure
 
-A simple cron-type library for clojure
+A simple cron-inspired library for clojure
 
 ## Usage
 
