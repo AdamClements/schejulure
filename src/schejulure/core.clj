@@ -3,9 +3,8 @@
             [clj-time.local :refer [local-now]])
   (:import [java.util.concurrent Executors TimeUnit]))
 
-(defn every-minute [f]
-  (doto (Executors/newScheduledThreadPool 1)
-    (.scheduleAtFixedRate f 0 60000 TimeUnit/MILLISECONDS)))
+(defn call-every-minute [f]
+  (.scheduleAtFixedRate (Executors/newScheduledThreadPool 1) f 0 1 TimeUnit/MINUTES))
 
 (defn cron-of [time]
   [(minute time)
@@ -14,10 +13,11 @@
    (month time)
    (day-of-week time)])
 
+(defn has? [coll item] (some #{item} coll))
+(defn all? [coll] (every? identity coll))
+
 (defn cron-match? [cron cron-range]
-  (every? identity
-          (map (fn [x coll] (some #(= x %) coll))
-               cron cron-range)))
+  (all? (map has? cron-range cron)))
 
 (def cron-defaults {:minute (range 0 60)
                     :hour   (range 0 24)
@@ -33,6 +33,8 @@
                   :fri 5 5 5
                   :sat 6 6 6})
 
+(def weekdays [:mon :tue :wed :thu :fri])
+
 (defn keyword-day->number [x]
   (if (coll? x) (map day->number x)
       (list (day->number x))))
@@ -47,8 +49,14 @@
   (let [now (cron-of (local-now))]
     (doseq [[schedule f] scheduled-fns]
       (when (cron-match? now (cronmap->cronrange schedule))
-        (f)))))
+        (try (f)
+             (catch Exception e
+               (println "Caught exception in scheduled action " f " at " now)
+               (.printStackTrace e)))))))
 
-(defn schedule [& args]
+(defn schedule
+  "Takes pairs of cron-maps with the function to call when that cron-map
+   matches the current time"
+  [& args]
   (let [scheduled-fns (partition 2 args)]
-    (every-minute (partial fire-scheduled scheduled-fns))))
+    (call-every-minute #(fire-scheduled scheduled-fns))))
