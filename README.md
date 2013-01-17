@@ -8,9 +8,9 @@ A simple cron-inspired library for clojure
       (schedule {:hour 12 :minute [0 15 30 45]} my-function
                 {:hour (range 0 24 6) :minute 0 :day [:sat :sun]} batch-job))
 
-This will start running straight away. I tried to keep things looking similar to futures. Unlike a lot of libraries there isn't one central stateful scheduler in an atom, you can run as many as you like. schedule gives you a ScheduledThreadPoolExecutor, so you can do
+This will start running straight away. This actually returns a future, which can be manipulated in all the same ways as a normal clojure future. Unlike a lot of libraries there isn't one central stateful scheduler in an atom, you can run as many as you like.
 
-    (.cancel my-running-scheduler)
+    (future-cancel my-running-scheduler)
 
 The schedule map is modelled after crontabs, you can specify
 {:minute :hour :date :month :day}
