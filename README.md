@@ -4,6 +4,14 @@ A simple cron-inspired library for clojure
 
 ## Usage
 
+Include the library in your leiningen project dependencies:
+
+    [schejulure "0.1.1"]
+
+Then use it to schedule something:
+
+    (use 'schejulure.core)
+
     (def my-running-scheduler
       (schedule {:hour 12 :minute [0 15 30 45]} my-function
                 {:hour (range 0 24 6) :minute 0 :day [:sat :sun]} batch-job))
