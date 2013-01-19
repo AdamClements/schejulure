@@ -58,7 +58,22 @@
 
 (defn schedule
   "Takes pairs of cron-maps with the function to call when that cron-map
-   matches the current time"
+   matches the current time.
+
+   The default cron-map executes every minute of every day, add elements
+   into the map to restrict this, for example {:day [:mon :tue] :hour 5}
+   will execute every minute between 5 and 6am on mondays and tuesdays
+   where {:minute [15 45]} will execute and quarter past and quarter to
+   the hour, every hour every day.
+
+   If an exception is thrown and uncaught by your, execution will continue
+   rather than interrupt future scheduled executions, if you need to handle
+   the error your function must catch it.
+
+   All the scheduled tasks run in a single thread, therefore long running
+   tasks may impact the execution of subsequent tasks. If your task takes
+   a non trivial amount of time, have the scheduler fire off a future
+   rather than running it directly."
   [& args]
   (let [scheduled-fns (partition 2 args)]
     (call-every-minute #(fire-scheduled scheduled-fns))))
