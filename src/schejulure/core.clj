@@ -3,10 +3,10 @@
             [clj-time.local :refer [local-now]])
   (:import [java.util.concurrent Executors TimeUnit]))
 
-(def pool (delay (Executors/newScheduledThreadPool 1)))
+(def pool (Executors/newScheduledThreadPool 1))
 
 (defn call-every-minute [f]
-  (.scheduleAtFixedRate @pool f 0 1 TimeUnit/MINUTES))
+  (.scheduleAtFixedRate pool f 0 1 TimeUnit/MINUTES))
 
 (defn cron-of [time]
   [(minute time)
