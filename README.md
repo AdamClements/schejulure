@@ -6,7 +6,7 @@ A simple cron-inspired library for clojure
 
 Include the library in your leiningen project dependencies:
 
-    [schejulure "0.1.1"]
+    [schejulure "0.1.2"]
 
 Then use it to schedule something:
 

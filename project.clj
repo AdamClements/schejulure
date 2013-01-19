@@ -1,4 +1,4 @@
-(defproject schejulure "0.1.2-SNAPSHOT"
+(defproject schejulure "0.1.2"
   :description "A simple long-term scheduling library inspired by cron and future"
   :url "http://www.github.com/AdamClements/schejulure"
   :license {:name "Eclipse Public License"
