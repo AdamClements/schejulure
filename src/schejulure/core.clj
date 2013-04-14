@@ -36,6 +36,7 @@
                   :sun 7, 7 7, 0 7})
 
 (def weekdays [:mon :tue :wed :thu :fri])
+(def weekends [:sat :sun])
 
 (defn keyword-day->number [x]
   (if (coll? x) (map day->number x)
