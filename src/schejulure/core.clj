@@ -13,7 +13,7 @@
    (hour time)
    (day time)
    (month time)
-   (day-of-week time)])
+   (-> time day-of-week dec)])
 
 (defn has? [coll item] (some #{item} coll))
 (defn all? [coll] (every? identity coll))
