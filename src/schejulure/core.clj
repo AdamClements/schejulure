@@ -25,15 +25,15 @@
                     :hour   (range 0 24)
                     :date   (range 1 32)
                     :month  (range 1 13)
-                    :day    (range 0  7)})
+                    :day    (range 1  8)})
 
-(def day->number {:sun 0 0 0
-                  :mon 1 1 1
-                  :tue 2 2 2
-                  :wed 3 3 3
-                  :thu 4 4 4
-                  :fri 5 5 5
-                  :sat 6 6 6})
+(def day->number {:mon 1, 1 1
+                  :tue 2, 2 2
+                  :wed 3, 3 3
+                  :thu 4, 4 4
+                  :fri 5, 5 5
+                  :sat 6, 6 6
+                  :sun 7, 7 7, 0 7})
 
 (def weekdays [:mon :tue :wed :thu :fri])
 
