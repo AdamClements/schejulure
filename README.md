@@ -6,7 +6,7 @@ A simple cron-inspired library for clojure
 
 Include the library in your leiningen project dependencies:
 
-    [schejulure "0.1.2"]
+    [schejulure "0.1.3"]
 
 Then use it to schedule something:
 
@@ -35,8 +35,14 @@ which take a non-trivial amount of time to run, it's recommended you
 fire a future from within the scheduler, allowing it to continue with
 other tasks.
 
+## Changelog
+
+### 0.1.3
+
+* Bugfix - Schejulure no longer observes the sabbath (i.e. it works on Sundays)
+
 ## License
 
-Copyright © 2012 Adam Clements
+Copyright © 2012-2013 Adam Clements
 
 Distributed under the Eclipse Public License, the same as Clojure.
