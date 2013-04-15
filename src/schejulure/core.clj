@@ -6,23 +6,35 @@
 
 (def pool (Executors/newScheduledThreadPool 1))
 
-(defn current-minute [time]
+(defn current-minute
+  "Given a DateTime, truncate to the current minute (removing seconds
+   and millisecond components)"
+  [time]
   (apply date-time ((juxt year month day hour minute) time)))
 
-(defn next-minute [time]
+(defn next-minute
+  "Given a DateTime, gives the next upcoming minute boundary"
+  [time]
   (plus (current-minute time) (-> 1 minutes)))
 
-(defn secs-to-next-minute [time]
-  ;; Seconds to next minute will be a low estimation as it misses out
-  ;; the milliseconds component. We are interested in a slight
-  ;; overestimation so that it's just into the next minute if anything,
-  ;; therefore add one to the interval in seconds
+(defn secs-to-next-minute
+  "Given a time, will give the number of additional seconds required to
+   move into the next minute"
+  [time]
   (inc (in-secs (interval time (next-minute time)))))
 
-(defn call-every-minute [f]
+(defn call-every-minute
+  "Schedules a function to be called every minute, within a second of
+   the minute boundary on the clock"
+  [f]
   (.scheduleAtFixedRate pool f (secs-to-next-minute (now)) 60 TimeUnit/SECONDS))
 
-(defn cron-of [time]
+(defn cron-of
+  "Returns a cron-like vector. Note that the days range from 1-7 instead
+   of traditional cron's 0-6.
+
+   Do not use this! Use the far more convenient map format instead."
+  [time]
   [(minute time)
    (hour time)
    (day time)
@@ -32,7 +44,14 @@
 (defn has? [coll item] (some #{item} coll))
 (defn all? [coll] (every? identity coll))
 
-(defn cron-match? [cron cron-range]
+(defn cron-match?
+  "Gives whether every element of a vector (a cron) can be found in the
+   corresponding element of a vector of vectors (a cron range).
+
+   e.g.
+   (cron-match? [0 1] [[0 1 2] [0 1 2]]) => true
+   (cron-match? [0 5] [[0 1 2] [0 1 2]]) => false"
+  [cron cron-range]
   (all? (map has? cron-range cron)))
 
 (def cron-defaults {:minute (range 0 60)
@@ -52,7 +71,10 @@
 (def weekdays [:mon :tue :wed :thu :fri])
 (def weekends [:sat :sun])
 
-(defn keyword-day->number [x]
+(defn keyword-day->number
+  "Translates keywords e.g. :mon into the appropriate clj-time integer
+   representation"
+  [x]
   (if (coll? x) (map day->number x)
       (list (day->number x))))
 
@@ -62,7 +84,11 @@
            (update-in [:day] keyword-day->number)
            ((juxt :minute :hour :date :month :day)))))
 
-(defn fire-scheduled [scheduled-fns]
+(defn fire-scheduled
+  "Given a map of firing times to functions, checks whether the current
+   local time matches any of them and calls the ones that do, presumably
+   for side effects"
+  [scheduled-fns]
   (let [now (cron-of (local-now))]
     (doseq [[schedule f] scheduled-fns]
       (when (cron-match? now (cronmap->cronrange schedule))
@@ -81,14 +107,14 @@
    where {:minute [15 45]} will execute and quarter past and quarter to
    the hour, every hour every day.
 
-   If an exception is thrown and uncaught by your, execution will continue
-   rather than interrupt future scheduled executions, if you need to handle
-   the error your function must catch it.
+   If an exception is thrown and uncaught by your, execution will
+   continue rather than interrupt future scheduled executions, if you
+   need to handle the error your function must catch it.
 
-   All the scheduled tasks run in a single thread, therefore long running
-   tasks may impact the execution of subsequent tasks. If your task takes
-   a non trivial amount of time, have the scheduler fire off a future
-   rather than running it directly."
+   All the scheduled tasks run in a single thread, therefore long
+   running tasks may impact the execution of subsequent tasks. If your
+   task takes a non trivial amount of time, have the scheduler fire off
+   a future rather than running it directly."
   [& args]
   (let [scheduled-fns (partition 2 args)]
     (call-every-minute #(fire-scheduled scheduled-fns))))
