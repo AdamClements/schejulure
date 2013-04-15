@@ -1,12 +1,26 @@
 (ns schejulure.core
-  (:require [clj-time.core :refer [minute hour day month day-of-week]]
+  (:require [clj-time.core :refer [date-time year minute hour day month day-of-week
+                                   minutes in-secs interval plus now]]
             [clj-time.local :refer [local-now]])
   (:import [java.util.concurrent Executors TimeUnit]))
 
 (def pool (Executors/newScheduledThreadPool 1))
 
+(defn current-minute [time]
+  (apply date-time ((juxt year month day hour minute) time)))
+
+(defn next-minute [time]
+  (plus (current-minute time) (-> 1 minutes)))
+
+(defn secs-to-next-minute [time]
+  ;; Seconds to next minute will be a low estimation as it misses out
+  ;; the milliseconds component. We are interested in a slight
+  ;; overestimation so that it's just into the next minute if anything,
+  ;; therefore add one to the interval in seconds
+  (inc (in-secs (interval time (next-minute time)))))
+
 (defn call-every-minute [f]
-  (.scheduleAtFixedRate pool f 0 1 TimeUnit/MINUTES))
+  (.scheduleAtFixedRate pool f (secs-to-next-minute (now)) 60 TimeUnit/SECONDS))
 
 (defn cron-of [time]
   [(minute time)
