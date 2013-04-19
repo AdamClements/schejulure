@@ -6,22 +6,27 @@ A simple cron-inspired library for clojure
 
 Include the library in your leiningen project dependencies:
 
-    [schejulure "0.1.4"]
+```clojure
+[schejulure "0.1.4"]
+```
 
 Then use it to schedule something:
 
-    (use 'schejulure.core)
+```clojure
+(use 'schejulure.core)
 
-    (def my-running-scheduler
-      (schedule {:hour 12 :minute [0 15 30 45]} my-function
-                {:hour (range 0 24 6) :minute 0 :day [:sat :sun]} batch-job))
+(def my-running-scheduler
+  (schedule {:hour 12 :minute [0 15 30 45]} my-function
+    {:hour (range 0 24 6) :minute 0 :day [:sat :sun]} batch-job))
+```
 
 This will start running straight away. This actually returns a future, which can be manipulated in all the same ways as a normal clojure future. Unlike a lot of libraries there isn't one central stateful scheduler in an atom, you can run as many as you like.
 
-    (future-cancel my-running-scheduler)
+```clojure
+(future-cancel my-running-scheduler)
+```
 
-The schedule map is modelled after crontabs, you can specify
-{:minute :hour :date :month :day}
+The schedule map is modelled after crontabs, you can specify _{:minute :hour :date :month :day}_
 Each of these takes either a single value, or a list of values which when matched should fire the function. This means that you can use clojure's range and other list functions to generate for example every 5 minutes (range 0 60 5)
 
 Exceptions will be caught and a stacktrace printed rather than affect
