@@ -1,6 +1,6 @@
 (ns schejulure.core
   (:require [clj-time.core :refer [date-time year minute hour day month day-of-week
-                                   minutes in-secs interval plus now]]
+                                   minutes in-seconds interval plus now]]
             [clj-time.local :refer [local-now]])
   (:import [java.util.concurrent Executors TimeUnit]))
 
@@ -21,7 +21,7 @@
   "Given a time, will give the number of additional seconds required to
    move into the next minute"
   [time]
-  (inc (in-secs (interval time (next-minute time)))))
+  (inc (in-seconds (interval time (next-minute time)))))
 
 (defn call-every-minute
   "Schedules a function to be called every minute, within a second of
