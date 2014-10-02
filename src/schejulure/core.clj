@@ -93,7 +93,7 @@
     (doseq [[schedule f] scheduled-fns]
       (when (cron-match? now (cronmap->cronrange schedule))
         (try (f)
-             (catch Exception e
+             (catch Throwable e
                (println "Caught exception in scheduled action " f " at " now)
                (.printStackTrace e)))))))
 

@@ -7,7 +7,7 @@ A simple cron-inspired library for clojure
 Include the library in your leiningen project dependencies:
 
 ```clojure
-[schejulure "0.1.4"]
+[schejulure "1.0.1"]
 ```
 
 Then use it to schedule something:
@@ -41,6 +41,9 @@ fire a future from within the scheduler, allowing it to continue with
 other tasks.
 
 ## Changelog
+
+### 1.0.1
+* Change caught exceptions to Throwable so nothing can kill the scheduler inadvertently
 
 ### 0.1.4
 
