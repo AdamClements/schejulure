@@ -1,6 +1,7 @@
 (ns schejulure.core
   (:require [clj-time.core :refer [date-time year minute hour day month day-of-week
-                                   minutes in-seconds interval plus now]]
+                                   minutes in-seconds interval plus now]
+             :as clj-time]
             [clj-time.local :refer [local-now]])
   (:import [java.util.concurrent Executors TimeUnit]))
 
@@ -23,11 +24,10 @@
   [time]
   (inc (in-seconds (interval time (next-minute time)))))
 
-(defn call-every-minute
-  "Schedules a function to be called every minute, within a second of
-   the minute boundary on the clock"
+(defn call-every-second
+  "Schedules a function to be called every second"
   [f]
-  (.scheduleAtFixedRate pool f (secs-to-next-minute (now)) 60 TimeUnit/SECONDS))
+  (.scheduleAtFixedRate pool f 1 1 TimeUnit/SECONDS))
 
 (defn cron-of
   "Returns a cron-like vector. Note that the days range from 1-7 instead
@@ -35,7 +35,8 @@
 
    Do not use this! Use the far more convenient map format instead."
   [time]
-  [(minute time)
+  [(clj-time/second time)
+   (minute time)
    (hour time)
    (day time)
    (month time)
@@ -54,7 +55,8 @@
   [cron cron-range]
   (all? (map has? cron-range cron)))
 
-(def cron-defaults {:minute (range 0 60)
+(def cron-defaults {:second 0
+                    :minute (range 0 60)
                     :hour   (range 0 24)
                     :date   (range 1 32)
                     :month  (range 1 13)
@@ -82,7 +84,7 @@
   (map (fn [x] (if (coll? x) x (list x)))
        (-> (merge cron-defaults cronmap)
            (update-in [:day] keyword-day->number)
-           ((juxt :minute :hour :date :month :day)))))
+           ((juxt :second :minute :hour :date :month :day)))))
 
 (defn fire-scheduled
   "Given a map of firing times to functions, checks whether the current
@@ -117,4 +119,4 @@
    a future rather than running it directly."
   [& args]
   (let [scheduled-fns (partition 2 args)]
-    (call-every-minute #(fire-scheduled scheduled-fns))))
+    (call-every-second #(fire-scheduled scheduled-fns))))
