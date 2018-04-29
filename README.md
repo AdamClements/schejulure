@@ -26,7 +26,7 @@ This will start running straight away. This actually returns a future, which can
 (future-cancel my-running-scheduler)
 ```
 
-The schedule map is modelled after crontabs, you can specify _{:minute :hour :date :month :day}_
+The schedule map is modelled after crontabs, you can specify _{:second :minute :hour :date :month :day}_
 Each of these takes either a single value, or a list of values which when matched should fire the function. This means that you can use clojure's range and other list functions to generate for example every 5 minutes (range 0 60 5)
 
 Exceptions will be caught and a stacktrace printed rather than affect
@@ -41,6 +41,9 @@ fire a future from within the scheduler, allowing it to continue with
 other tasks.
 
 ## Changelog
+
+### 1.0.2
+* Added :second scheduling feature
 
 ### 1.0.1
 * Change caught exceptions to Throwable so nothing can kill the scheduler inadvertently
